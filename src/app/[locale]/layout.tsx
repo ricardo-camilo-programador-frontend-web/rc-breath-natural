@@ -99,8 +99,8 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <IntroWarningModal
-            linkedinUsername={process.env.LINKEDIN_USERNAME || ""}
-            portfolioUrl={process.env.PORTFOLIO_URL || ""}
+            linkedinUrl={process.env.NEXT_PUBLIC_LINKEDIN_URL || ""}
+            portfolioUrl={process.env.NEXT_PUBLIC_PORTFOLIO_URL || ""}
           />
           {children}
         </NextIntlClientProvider>
@@ -114,7 +114,7 @@ export default async function RootLayout({
         ></div>
 
         <PortfolioShortcut
-          portfolioUrl={process.env.PORTFOLIO_URL || ""}
+          portfolioUrl={process.env.NEXT_PUBLIC_PORTFOLIO_URL || ""}
           customClassName="fixed bottom-4 left-4 hover:bg-gray-500 hover:text-white transition-all ease-in-out duration-300 z-[9999 md:bottom-6 md:left-6 lg:bottom-8 lg:left-8"
           showText={false}
         />
