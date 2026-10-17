@@ -20,7 +20,7 @@
     "i18next": "^24.2.1",
     "lucide-react": "^0.471.2",
     "next": "15.5.28",
-    "next-intl": "^4.14.9",
+    "next-intl": "^3.26.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
@@ -50,10 +50,5 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@11.0.9",
-  "pnpm": {
-    "overrides": {
-      "postcss-selector-parser": "^7.1.6"
-    }
-  }
+  "packageManager": "pnpm@11.0.9"
 }
