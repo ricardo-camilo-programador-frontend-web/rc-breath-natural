@@ -2,36 +2,43 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   validate:
     name: Validar Linting e Formatacao
-    runs-on: self-hosted
-    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PATH
-        run: echo "/usr/local/bin" >> $GITHUB_PATH
-      - name: Cache pnpm store
-        uses: actions/cache@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ~/.local/share/pnpm/store
-          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          node-version: '22'
+          cache: 'pnpm'
 
       - name: Instalar dependencias
-        run: pnpm install --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Executar Lint
         run: pnpm run lint
 
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Testes
+        run: pnpm run test
+
   build:
     name: Build do Projeto
-    runs-on: self-hosted
-    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       NEXT_PUBLIC_SITE_URL: "https://breath-natural-nextjs-chronicles.netlify.app"
       NEXT_PUBLIC_API_URL: "http://localhost:3000"
@@ -55,16 +62,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PATH
-        run: echo "/usr/local/bin" >> $GITHUB_PATH
-      - name: Cache pnpm store
-        uses: actions/cache@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ~/.local/share/pnpm/store
-          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          node-version: '22'
+          cache: 'pnpm'
 
       - name: Instalar dependencias
-        run: pnpm install --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Build do projeto
         run: pnpm run build
@@ -73,27 +81,28 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-dist
-          path: dist/
+          path: .next/
           retention-days: 7
 
   security:
     name: Auditoria de Seguranca
-    runs-on: self-hosted
-    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PATH
-        run: echo "/usr/local/bin" >> $GITHUB_PATH
-      - name: Cache pnpm store
-        uses: actions/cache@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ~/.local/share/pnpm/store
-          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          node-version: '22'
+          cache: 'pnpm'
 
       - name: Instalar dependencias
-        run: pnpm install --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Auditoria de vulnerabilidades
         shell: bash
@@ -115,46 +124,69 @@ jobs:
 
           exit "$status"
 
+  # Sonar duplicado do workflow sonarqube.yml; no self-hosted usava /opt/sonar-scanner.
+  # Mantido como soft-check via ubuntu + docker; falha de host não bloqueia a PR.
   sonar:
     name: Analise SonarQube
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup PATH
-        run: echo "/usr/local/bin" >> $GITHUB_PATH
-      - name: Cache pnpm store
-        uses: actions/cache@v3
         with:
-          path: ~/.local/share/pnpm/store
-          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
 
       - name: Instalar dependencias
-        run: pnpm install --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Run SonarScanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: /opt/sonar-scanner/bin/sonar-scanner
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_HOST_URL" ]; then
+            echo "::warning::SONAR_TOKEN/SONAR_HOST_URL ausentes; pulando Sonar no CI."
+            exit 0
+          fi
+          if ! curl -f -s --max-time 10 "$SONAR_HOST_URL/api/system/status" >/dev/null; then
+            echo "::warning::SonarQube inacessível em $SONAR_HOST_URL; pulando."
+            exit 0
+          fi
+          docker run --rm \
+            -v "$PWD:/usr/src" \
+            -w /usr/src \
+            -e SONAR_TOKEN="$SONAR_TOKEN" \
+            sonarsource/sonar-scanner-cli:latest \
+            -Dsonar.token="$SONAR_TOKEN" \
+            -Dsonar.host.url="$SONAR_HOST_URL"
 
   deploy:
     name: Deploy Netlify
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [build]
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PATH
-        run: echo "/usr/local/bin" >> $GITHUB_PATH
-      - name: Cache pnpm store
-        uses: actions/cache@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ~/.local/share/pnpm/store
-          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          node-version: '22'
+          cache: 'pnpm'
 
       - name: Instalar dependencias
-        run: pnpm install --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Build do projeto
         run: pnpm run build
@@ -163,4 +195,4 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: npx netlify deploy --prod --dir=dist
+        run: npx netlify deploy --prod --dir=.next

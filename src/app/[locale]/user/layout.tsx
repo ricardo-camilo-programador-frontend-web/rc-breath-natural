@@ -4,11 +4,12 @@ import AdminLayout from "@/layouts/AdminLayout";
 
 export default async function UserLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   const messages = (await import(`@/messages/${locale}.json`)).default;
 
   return (
