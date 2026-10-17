@@ -15,6 +15,21 @@ describe('resolveAnalyticsConfig', () => {
     expect(s).not.toContain('prss6enkpp')
     expect(s).not.toContain('G-E3JCH5GRKZ')
   })
+  it('GTM ligado sem IDs declarados: pula as tags diretas (sem contagem dupla)', () => {
+    const c = resolveAnalyticsConfig({ NEXT_PUBLIC_GTM_ENABLED: 'true' })
+    expect(c.loadGtm).toBe(true)
+    expect(c.loadGtag).toBe(false)
+    expect(c.loadClarity).toBe(false)
+  })
+  it('GTM ligado com IDs diferentes: mantém as tags diretas', () => {
+    const c = resolveAnalyticsConfig({
+      NEXT_PUBLIC_GTM_ENABLED: 'true',
+      NEXT_PUBLIC_GTM_GA4_ID: 'G-OTHER',
+      NEXT_PUBLIC_GTM_CLARITY_ID: 'other',
+    })
+    expect(c.loadGtag).toBe(true)
+    expect(c.loadClarity).toBe(true)
+  })
   it('skips direct tags only when GTM declares the same IDs', () => {
     const c = resolveAnalyticsConfig({
       NEXT_PUBLIC_GTM_ENABLED: 'true',

@@ -1,36 +1,48 @@
 'use client'
 
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import * as gtm from '@/lib/gtm'
-import { getItemFromLocalStorage } from '@/utils/localStorage'
-import { ANALYTICS_LOCAL_STORAGE_NAME } from '@/static/analyticsLocalStorageName'
-import { Suspense } from 'react'
+import { analyticsConfig } from '@/lib/analytics/config'
+import { useIntroModalStore } from '@/store/introModalStore'
 import Loading from '@/components/Loading'
+import { buildPagePath } from '@/lib/analytics/page-path'
+
+type WindowWithGtag = Window & { gtag?: (...args: unknown[]) => void }
 
 function AnalyticsContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const isAnalyticsEnabled = getItemFromLocalStorage(ANALYTICS_LOCAL_STORAGE_NAME)
+  // Consentimento gravado pelo IntroWarningModal (zustand persist "intro-modal-storage")
+  const isAnalyticsEnabled = useIntroModalStore((state) => state.analyticsEnabled)
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
-    const removeAnalyticsScriptFromDom = () => {
-      if (!isAnalyticsEnabled) {
-        const script = document.getElementById('gtm-script')
-        if (script) {
-          script.remove()
-        }
-      }
+    if (!isAnalyticsEnabled) {
+      const timer = setTimeout(() => {
+        document.getElementById('gtm-script')?.remove()
+      }, 1500)
+      return () => clearTimeout(timer)
     }
+    if (!pathname) return
 
-    if (pathname && isAnalyticsEnabled) {
-      gtm.pageview(pathname + searchParams.toString())
-      return;
+    const pagePath = buildPagePath(pathname, searchParams.toString())
+    gtm.pageview(pagePath)
+
+    // O gtag('config') inicial já conta a 1ª página; nas navegações do App Router,
+    // envia page_view manual para o GA4 direto.
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
     }
-
-    setTimeout(() => {
-      removeAnalyticsScriptFromDom()
-    }, 1500)
+    const w = window as WindowWithGtag
+    if (analyticsConfig.loadGtag && typeof w.gtag === 'function') {
+      w.gtag('event', 'page_view', {
+        page_path: pagePath,
+        page_location: window.location.href,
+        send_to: analyticsConfig.ga4Id,
+      })
+    }
   }, [pathname, searchParams, isAnalyticsEnabled])
 
   return null

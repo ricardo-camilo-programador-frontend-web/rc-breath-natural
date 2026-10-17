@@ -24,19 +24,20 @@ jobs:
         with:
           fetch-depth: 0  # Full history needed for proper analysis
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'  # ou 'pnpm' se usar pnpm
+          node-version: '22'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
-        # Se usar pnpm: run: pnpm install --frozen-lockfile
-        # Se usar yarn: run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Run ESLint (optional - SonarQube can also run ESLint)
-        run: npm run lint
+        run: pnpm run lint
         continue-on-error: true
 
       - name: SonarQube Scan

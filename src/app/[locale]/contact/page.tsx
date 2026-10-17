@@ -6,7 +6,13 @@ import DefaultLayout from "@/layouts/DefaultLayout";
 import { useTranslations } from "next-intl";
 import RandomBackground from "@/blocks/randomBackground";
 
-export const metadata: Metadata = {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
   metadataBase: new URL(SITE_URL),
   title: "Breath Natural - Contact Us",
   description: "Get in touch with Breath Natural for any inquiries or questions about our indoor plants, care guides, and services.",
@@ -21,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Breath Natural - Contact Us",
     description: "Get in touch with Breath Natural for any inquiries or questions about our indoor plants, care guides, and services.",
-    url: `${SITE_URL}/contact`,
+    url: `${SITE_URL}/${locale}/contact`,
     siteName: "Breath Natural",
     images: [
       {
@@ -31,7 +37,8 @@ export const metadata: Metadata = {
       },
     ],
   },
-};
+  };
+}
 
 const ContactPage = () => {
   const t = useTranslations('contact')
