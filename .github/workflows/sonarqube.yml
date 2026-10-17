@@ -53,9 +53,9 @@ jobs:
           fi
 
           echo "Testing SonarQube connectivity..."
-          curl -f -s "$SONAR_HOST_URL/api/system/status" >/dev/null || {
-            echo "::error::Cannot connect to SonarQube at $SONAR_HOST_URL"
-            exit 1
+          curl -f -s --max-time 10 "$SONAR_HOST_URL/api/system/status" >/dev/null || {
+            echo "::warning::Cannot connect to SonarQube at $SONAR_HOST_URL — skipping scan"
+            exit 0
           }
 
           echo "Running SonarQube scan..."
