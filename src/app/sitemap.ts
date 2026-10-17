@@ -1,7 +1,8 @@
+import { SITE_URL } from '@/lib/site'
 import type { MetadataRoute } from 'next'
 import { locales, defaultLocale } from "@/config/i18n-config";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+const baseUrl = SITE_URL
 
 const staticRoutes = [
   '',

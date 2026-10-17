@@ -1,19 +1,17 @@
 /**
  * Analytics config: env wins, defaults are the fallback.
- * Default path: direct gtag (GA4). GTM is optional (NEXT_PUBLIC_GTM_ENABLED=true).
- * When GTM is enabled and its container already fires the same GA4 ID,
- * the direct gtag is skipped to avoid double counting.
+ * Default path: direct gtag (GA4 G-F9LYZ0P52E) + direct Clarity (yyrpt8sig2).
+ * GTM is opt-in (NEXT_PUBLIC_GTM_ENABLED=true): the GTM-TPFBQFX6 container still
+ * publishes legacy tags, so it stays off until the container is cleaned up.
+ * When GTM is enabled and declares (via env) that it fires the same GA4 ID or
+ * a Clarity project, the direct tag is skipped to avoid double counting.
  */
 export const DEFAULTS = {
   clarityId: 'yyrpt8sig2',
   ga4Id: 'G-F9LYZ0P52E',
   gtmId: 'GTM-TPFBQFX6',
-  // GA4 ID published by the GTM container (checked in gtm.js)
-  gtmGa4Id: 'G-E3JCH5GRKZ',
   counterId: 'f30df6f3-776d-4154-959d-0210ac8a8325',
   counterUtcOffset: '-3',
-  // Clarity project fired by the GTM container ('' = none); direct Clarity is skipped when GTM loads it
-  gtmClarityId: 'prss6enkpp',
 } as const
 
 type Env = Record<string, string | undefined>
@@ -48,13 +46,13 @@ export function resolveAnalyticsConfig(env: Env): AnalyticsConfig {
     pick(env.NEXT_PUBLIC_GA4_ID, env.NEXT_PUBLIC_GA_MEASUREMENT_ID) ||
     DEFAULTS.ga4Id
   const gtmId = pick(env.NEXT_PUBLIC_GTM_ID) || DEFAULTS.gtmId
-  const gtmEnabled = (env.NEXT_PUBLIC_GTM_ENABLED ?? 'true').trim() === 'true'
-  const gtmGa4Id = pick(env.NEXT_PUBLIC_GTM_GA4_ID) || DEFAULTS.gtmGa4Id
+  const gtmEnabled = (env.NEXT_PUBLIC_GTM_ENABLED ?? 'false').trim() === 'true'
+  const gtmGa4Id = pick(env.NEXT_PUBLIC_GTM_GA4_ID)
   const loadGtm = enabled && gtmEnabled && !!gtmId
   const loadGtag = enabled && !!ga4Id && !(loadGtm && gtmGa4Id === ga4Id)
   const clarityId = pick(env.NEXT_PUBLIC_CLARITY_ID) || DEFAULTS.clarityId
   const loadClarity =
-    enabled && !!clarityId && !(loadGtm && (DEFAULTS.gtmClarityId as string) !== '')
+    enabled && !!clarityId && !(loadGtm && pick(env.NEXT_PUBLIC_GTM_CLARITY_ID) !== '')
   return {
     enabled,
     clarityId,
@@ -81,6 +79,7 @@ export const analyticsConfig = resolveAnalyticsConfig({
   NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
   NEXT_PUBLIC_GTM_ENABLED: process.env.NEXT_PUBLIC_GTM_ENABLED,
   NEXT_PUBLIC_GTM_GA4_ID: process.env.NEXT_PUBLIC_GTM_GA4_ID,
+  NEXT_PUBLIC_GTM_CLARITY_ID: process.env.NEXT_PUBLIC_GTM_CLARITY_ID,
   NEXT_PUBLIC_COUNTER_ID: process.env.NEXT_PUBLIC_COUNTER_ID,
   NEXT_PUBLIC_COUNTER_DEV_ID: process.env.NEXT_PUBLIC_COUNTER_DEV_ID,
   NEXT_PUBLIC_COUNTER_UTCOFFSET: process.env.NEXT_PUBLIC_COUNTER_UTCOFFSET,

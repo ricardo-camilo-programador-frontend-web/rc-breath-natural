@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'bs.plantnet.org' },
     ],
     formats: ['image/avif', 'image/webp'],
+    qualities: [60, 75],
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

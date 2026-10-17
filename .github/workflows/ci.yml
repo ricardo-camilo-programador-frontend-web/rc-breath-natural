@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   validate:
@@ -27,6 +27,12 @@ jobs:
 
       - name: Executar Lint
         run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Testes
+        run: pnpm run test
 
   build:
     name: Build do Projeto
@@ -73,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-dist
-          path: dist/
+          path: .next/
           retention-days: 7
 
   security:
