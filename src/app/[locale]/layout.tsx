@@ -1,3 +1,4 @@
+import { SITE_URL } from '@/lib/site'
 import type { Metadata } from "next";
 import { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -28,9 +29,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: process.env.NEXT_PUBLIC_SITE_URL
-    ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
-    : undefined,
+  metadataBase: new URL(SITE_URL),
   title: "Breath Natural | Premium Indoor Plants & Decorative Greenery",
   description:
     "Transform your space with our curated collection of air-purifying indoor plants, exotic succulents, and stylish decorative greenery. Expert care guides, free shipping, and sustainable packaging included.",
@@ -82,11 +81,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   const messages = (await import(`@/messages/${locale}.json`)).default;
 
   return (

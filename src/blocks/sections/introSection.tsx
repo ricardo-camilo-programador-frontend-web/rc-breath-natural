@@ -51,6 +51,8 @@ const IntroSection: FC<IntroSectionProps> = ({ className }) => {
         fetchPriority="high"
         className="object-cover"
         sizes="100vw"
+        quality={60}
+        placeholder="blur"
       />
       <div className="max-w-7xl mx-auto relative grid grid-cols-1 md:grid-cols-2">
         <div className="flex flex-col justify-between items-start mb-16  pt-4 lg:pt-32 gap-4">
