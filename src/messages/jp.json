@@ -322,7 +322,9 @@
         "min": "メッセージは10文字以上である必要があります",
         "max": "メッセージは500文字を超えることはできません"
       }
-    }
+    },
+    "success": "メッセージを送信しました！まもなくご連絡します。",
+    "error": "メッセージの送信に失敗しました。後でもう一度お試しください。"
   },
   "plants": {
     "invalidDataError": "サーバーから無効なデータを受信しました",
@@ -388,7 +390,6 @@
     "faq": "よくある質問",
     "blog": "ブログ",
     "orders": "注文",
-    "plants": "植物",
     "plants": "Plantas",
     "dashboard": "Painel",
     "deposit": "Depósito",
@@ -637,7 +638,7 @@
       "bitcoin": "Bitcoin"
     },
     "creditCard": {
-      "label":"クレジットカード",
+      "label": "クレジットカード",
       "number": {
         "label": "カード番号",
         "required": "カード番号は必須です"
@@ -736,4 +737,3 @@
     "shipping": "配送"
   }
 }
-

@@ -322,7 +322,9 @@
         "min": "Wiadomość musi mieć co najmniej 10 znaków",
         "max": "Wiadomość nie może przekraczać 500 znaków"
       }
-    }
+    },
+    "success": "Wiadomość wysłana! Odpowiemy wkrótce.",
+    "error": "Nie udało się wysłać wiadomości. Spróbuj ponownie później."
   },
   "plants": {
     "invalidDataError": "Otrzymano nieprawidłowe dane z serwera",
@@ -388,7 +390,6 @@
     "faq": "FAQ",
     "blog": "Blog",
     "orders": "Zamówienia",
-    "plants": "Rośliny",
     "plants": "Plantas",
     "dashboard": "Painel",
     "deposit": "Depósito",
@@ -637,7 +638,7 @@
       "bitcoin": "Bitcoin"
     },
     "creditCard": {
-      "label":"Karta kredytowa",
+      "label": "Karta kredytowa",
       "number": {
         "label": "Numer karty",
         "required": "Numer karty jest wymagany"
@@ -736,4 +737,3 @@
     "shipping": "Dostawa"
   }
 }
-

@@ -70,8 +70,9 @@ const ContactPage = () => {
         email={t('email')}
         phoneNumber={t('phoneNumber')}
         message={t('message')}
-        sending={false}
         send={t('send')}
+        successMessage={t('success')}
+        errorMessage={t('error')}
         validationMessages={validationMessages}
       />
     </DefaultLayout>

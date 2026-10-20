@@ -13,6 +13,7 @@
     "ci": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
+    "@emailjs/browser": "^5.0.3",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^3.10.0",
     "embla-carousel": "8.5.1",

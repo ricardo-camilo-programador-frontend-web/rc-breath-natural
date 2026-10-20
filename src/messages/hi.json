@@ -277,7 +277,7 @@
         "Tornelia fragrans",
         "Mexican breadfruit"
       ],
-      "genus" : "Monstera",
+      "genus": "Monstera",
       "family": "Araceae",
       "links": {
         "self": "/api/v1/species/monstera-deliciosa",
@@ -322,7 +322,9 @@
         "min": "संदेश कम से कम 10 अक्षरों का होना चाहिए",
         "max": "संदेश 500 अक्षरों से अधिक नहीं हो सकता"
       }
-    }
+    },
+    "success": "संदेश भेजा गया! हम जल्द ही आपसे संपर्क करेंगे।",
+    "error": "संदेश भेजने में विफल। कृपया बाद में पुनः प्रयास करें।"
   },
   "plants": {
     "invalidDataError": "सर्वर से अमान्य डेटा प्राप्त हुआ",
@@ -388,7 +390,6 @@
     "faq": "अक्सर पूछे जाने वाले प्रश्न",
     "blog": "ब्लॉग",
     "orders": "आदेश",
-    "plants": "पौधे",
     "plants": "Plantas",
     "dashboard": "Painel",
     "deposit": "Depósito",
@@ -637,7 +638,7 @@
       "bitcoin": "Bitcoin"
     },
     "creditCard": {
-      "label":"क्रेडिट कार्ड",
+      "label": "क्रेडिट कार्ड",
       "number": {
         "label": "कार्ड नंबर",
         "required": "कार्ड नंबर आवश्यक है"
@@ -736,4 +737,3 @@
     "shipping": "शिपिंग"
   }
 }
-
