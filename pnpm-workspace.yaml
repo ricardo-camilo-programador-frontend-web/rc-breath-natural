@@ -1,8 +1,13 @@
 packages:
   - '.'
 allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
   esbuild: true
   sharp: true
+auditConfig:
+  ignoreGhsas:
+    - GHSA-vfj7-8cjw-p6xm
 minimumReleaseAgeExclude:
   - '@babel/runtime@7.26.10'
   - brace-expansion@1.1.12
@@ -58,3 +63,4 @@ minimumReleaseAgeExclude:
   - tinypool@2.1.2
 overrides:
   postcss: '^8.5.23'
+  postcss-selector-parser: '>=7.1.6'
