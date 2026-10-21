@@ -322,7 +322,9 @@
         "min": "A mensagem deve ter pelo menos 10 caracteres",
         "max": "A mensagem não pode exceder 500 caracteres"
       }
-    }
+    },
+    "success": "Mensagem enviada! Retornaremos em breve.",
+    "error": "Falha ao enviar a mensagem. Tente novamente mais tarde."
   },
   "plants": {
     "invalidDataError": "Dados inválidos recebidos do servidor",
@@ -637,7 +639,7 @@
       "bitcoin": "Bitcoin"
     },
     "creditCard": {
-      "label":"Cartão de Crédito",
+      "label": "Cartão de Crédito",
       "number": {
         "label": "Número do Cartão",
         "required": "Número do cartão é obrigatório"
@@ -736,4 +738,3 @@
     "shipping": "Frete"
   }
 }
-

@@ -9,6 +9,8 @@ import { EmailInput } from '@/components/forms/EmailInput'
 import { PhoneInput } from '@/components/forms/PhoneInput'
 import { TextArea } from '@/components/forms/TextArea'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { sendContactEmail } from '@/lib/emailjs'
 
 interface ContactFormProps {
   className?: string
@@ -22,8 +24,9 @@ interface ContactFormProps {
   email: string
   phoneNumber: string
   message: string
-  sending: boolean
   send: string
+  successMessage: string
+  errorMessage: string
   validationMessages: Record<string, string>
 }
 
@@ -39,28 +42,27 @@ export const ContactForm: FC<ContactFormProps> = ({
   email,
   phoneNumber,
   message,
-  sending = false,
   send,
+  successMessage,
+  errorMessage,
   validationMessages
 }) => {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { isSubmitting: sending, errors }
   } = useForm<ContactFormData>({
     resolver: zodResolver(getContactSchema(validationMessages))
   })
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      console.log(data)
-    } catch (error) {
-      console.error('Error submitting form:', error)
-    } finally {
-      setTimeout(() => {
-        reset()
-      }, 3000)
+      await sendContactEmail(data)
+      toast.success(successMessage)
+      reset()
+    } catch {
+      toast.error(errorMessage)
     }
   }
 
@@ -137,11 +139,9 @@ export const ContactForm: FC<ContactFormProps> = ({
               className="w-full"
             >
               {sending ? (
-                <span className="animate-pulse">{sending}</span>
+                <span className="animate-pulse">{send}…</span>
               ) : (
-                <>
-                  <span>{send}</span>
-                </>
+                <span>{send}</span>
               )}
             </Button>
           </form>
