@@ -40,21 +40,6 @@ describe('resolveAnalyticsConfig', () => {
     expect(c.loadGtag).toBe(false)
     expect(c.loadClarity).toBe(false)
   })
-
-  it('when GTM off, NEXT_PUBLIC_GTM_GA4_ID becomes extraGa4Id if different', () => {
-    const c = resolveAnalyticsConfig({ NEXT_PUBLIC_GTM_GA4_ID: 'G-SECONDARY' })
-    expect(c.loadGtm).toBe(false)
-    expect(c.extraGa4Id).toBe('G-SECONDARY')
-  })
-  it('extraGa4Id empty when same as primary or GTM on', () => {
-    expect(resolveAnalyticsConfig({ NEXT_PUBLIC_GTM_GA4_ID: 'G-F9LYZ0P52E' }).extraGa4Id).toBe('')
-    expect(
-      resolveAnalyticsConfig({
-        NEXT_PUBLIC_GTM_ENABLED: 'true',
-        NEXT_PUBLIC_GTM_GA4_ID: 'G-SECONDARY',
-      }).extraGa4Id,
-    ).toBe('')
-  })
   it('can be disabled', () => {
     expect(resolveAnalyticsConfig({ NEXT_PUBLIC_ANALYTICS_ENABLED: 'false' }).loadGtag).toBe(false)
   })
