@@ -1,7 +1,7 @@
 /**
  * Analytics config: env wins, defaults are the fallback.
  * Default path: direct gtag (GA4 G-F9LYZ0P52E) + direct Clarity (yyrpt8sig2).
- * GTM is opt-in (NEXT_PUBLIC_GTM_ENABLED=true): the GTM-TPFBQFX6 container still
+ * GTM is opt-in (NEXT_PUBLIC_GTM_ENABLED=true). Keep off until GTM-TPFBQFX6 Clarity is cleaned; with GTM off, NEXT_PUBLIC_GTM_GA4_ID can still fire a second GA4. Legacy note: the GTM-TPFBQFX6 container still
  * publishes legacy tags, so it stays off until the container is cleaned up.
  * When GTM is enabled, the container is assumed to fire GA4/Clarity, so the
  * direct tags are skipped unless NEXT_PUBLIC_GTM_GA4_ID / NEXT_PUBLIC_GTM_CLARITY_ID
@@ -32,6 +32,8 @@ export interface AnalyticsConfig {
   clarityId: string
   loadClarity: boolean
   ga4Id: string
+  /** Second GA4 when GTM is off (e.g. former GTM dual property via NEXT_PUBLIC_GTM_GA4_ID). */
+  extraGa4Id: string
   gtmId: string
   gtmEnabled: boolean
   loadGtag: boolean
@@ -58,11 +60,16 @@ export function resolveAnalyticsConfig(env: Env): AnalyticsConfig {
     enabled &&
     !!clarityId &&
     !(loadGtm && (gtmClarityId === '' || gtmClarityId === clarityId))
+  const extraGa4Id =
+    !loadGtm && pick(env.NEXT_PUBLIC_GTM_GA4_ID) && pick(env.NEXT_PUBLIC_GTM_GA4_ID) !== ga4Id
+      ? pick(env.NEXT_PUBLIC_GTM_GA4_ID)
+      : ''
   return {
     enabled,
     clarityId,
     loadClarity,
     ga4Id,
+    extraGa4Id,
     gtmId,
     gtmEnabled,
     loadGtag,
