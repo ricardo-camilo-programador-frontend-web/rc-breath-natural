@@ -322,7 +322,9 @@
         "min": "Die Nachricht muss mindestens 10 Zeichen lang sein",
         "max": "Die Nachricht darf nicht länger als 500 Zeichen sein"
       }
-    }
+    },
+    "success": "Nachricht gesendet! Wir melden uns in Kürze.",
+    "error": "Nachricht konnte nicht gesendet werden. Bitte später erneut versuchen."
   },
   "plants": {
     "invalidDataError": "Ungültige Daten vom Server erhalten",
@@ -389,7 +391,6 @@
     "blog": "Blog",
     "orders": "Bestellungen",
     "plants": "Pflanzen",
-    "plants": "Plantas",
     "dashboard": "Painel",
     "deposit": "Depósito",
     "wallets": "Carteiras",
@@ -635,7 +636,7 @@
       "bitcoin": "Bitcoin"
     },
     "creditCard": {
-      "label":"Kreditkarte",
+      "label": "Kreditkarte",
       "number": {
         "label": "Kartennummer",
         "required": "Kartennummer ist erforderlich"
