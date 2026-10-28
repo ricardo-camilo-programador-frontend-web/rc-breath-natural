@@ -3,7 +3,7 @@ import { analyticsConfig } from "@/lib/analytics/config";
 
 /** gtag direto por padrão; GTM opcional; nunca os dois com o mesmo GA4 ID. */
 export function AnalyticsScripts() {
-  const { clarityId, loadClarity, ga4Id, gtmId, loadGtag, loadGtm, counterId, counterUtcOffset, enabled } = analyticsConfig;
+  const { clarityId, loadClarity, ga4Id, extraGa4Id, gtmId, loadGtag, loadGtm, counterId, counterUtcOffset, enabled } = analyticsConfig;
   if (!enabled) return null;
   return (
     <>
@@ -11,7 +11,7 @@ export function AnalyticsScripts() {
         <>
           <Script src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} strategy="afterInteractive" />
           <Script id="ga4-gtag" strategy="afterInteractive">
-            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');`}
+            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');${extraGa4Id ? `gtag('config','${extraGa4Id}');` : ''}`}
           </Script>
         </>
       )}
