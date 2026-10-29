@@ -1,6 +1,6 @@
 export function getRandomLinkForRedirection() {
   const links = [
-    'https://www.linkedin.com/in/ricardo-camilo-492b95b3/',
+    'https://www.linkedin.com/in/ricardo-camilo-programador-frontend-web-developer',
     'https://x.com/Ricardo50993066',
     'https://www.instagram.com/ricardohks/',
   ];
