@@ -99,8 +99,8 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <IntroWarningModal
-            linkedinUrl={process.env.NEXT_PUBLIC_LINKEDIN_URL || ""}
-            portfolioUrl={process.env.NEXT_PUBLIC_PORTFOLIO_URL || ""}
+            linkedinUrl={"https://www.linkedin.com/in/ricardo-camilo-programador-frontend-web-developer"}
+            portfolioUrl={"https://ricardo-camilo-dev-frontend-web.netlify.app"}
           />
           {children}
         </NextIntlClientProvider>
@@ -114,7 +114,7 @@ export default async function RootLayout({
         ></div>
 
         <PortfolioShortcut
-          portfolioUrl={process.env.NEXT_PUBLIC_PORTFOLIO_URL || ""}
+          portfolioUrl={"https://ricardo-camilo-dev-frontend-web.netlify.app"}
           customClassName="fixed bottom-4 left-4 hover:bg-gray-500 hover:text-white transition-all ease-in-out duration-300 z-[9999 md:bottom-6 md:left-6 lg:bottom-8 lg:left-8"
           showText={false}
         />
