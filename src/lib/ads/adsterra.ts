@@ -1,23 +1,43 @@
 /**
- * Discreet Adsterra slot: native banner only (display banner optional).
+ * Discreet Adsterra slots: native banner and display banner only.
  *
  * Zone keys and script hosts come from public env vars. Nothing renders and no
  * script is injected when the key is missing or `NEXT_PUBLIC_ADSTERRA_ENABLED`
  * is `false`. The kill switch defaults to on only when a key is present.
  *
- * Consent follows the study-project modal when present. If
- * `window.rcStudyModal.isAnalyticsEnabled` exists and returns false, do not
- * load. A missing API does not block (the modal defaults analytics to on).
- * Listen for `rc-study-modal:analytics` (`detail` is the new boolean) and
- * unload if it becomes false.
+ * Consent follows the study-project modal. That modal's analytics toggle also
+ * updates Google `ad_storage`. If `window.rcStudyModal.isAnalyticsEnabled`
+ * exists and returns false, do not load. A missing API does not block (the
+ * modal defaults analytics to on). Listen for `rc-study-modal:analytics`
+ * (`detail` is the new boolean) and unload if it becomes false.
  *
  * Callers must also require `NODE_ENV === 'production'` and the canonical
  * hostname (`shouldLoadAdsterra`) so deploy previews stay clean.
  */
 
+/** Hosts autorizados para os scripts Adsterra. Rotacionam, revisar regularmente. */
+const ADSTERRA_SCRIPT_HOSTS = [
+  'https://*.profitableratecpmnetwork.com',
+  'https://*.effectivegatecpm.com',
+  'https://*.www.highperformanceformat.com', // display banner host (optional)
+  'https://fizzyacerbitymellow.com',
+  'https://sleepoverlimitprofound.com',
+  'https://exemplarfederallithe.com',
+  'https://furiousexpansion.com',
+  'https://consumeririssalary.com',
+] as const;
+
+/** Host adicional para suporte analítico; adicionamos em `connect-src`. */
+const ADSTERRA_CONNECT_HOSTS = ['https://protrafficinspector.com'] as const;
+
+/** Host adicional que carrega conteúdo em um iframe; adicionamos em `frame-src`. */
+const ADSTERRA_FRAME_HOSTS = ['https://cdn.cloudvideosa.com'] as const;
+
+export { ADSTERRA_SCRIPT_HOSTS, ADSTERRA_CONNECT_HOSTS, ADSTERRA_FRAME_HOSTS };
+
 export const DEFAULT_BANNER_HOST = 'www.highperformanceformat.com';
 
-/** Fired by the study-project modal when the analytics toggle changes. */
+/** Fired by `public/rc-study-modal.js` when the analytics toggle changes. */
 export const ADSTERRA_CONSENT_EVENT = 'rc-study-modal:analytics';
 
 const KEY_PATTERN = /^[a-z0-9]{8,64}$/i;
