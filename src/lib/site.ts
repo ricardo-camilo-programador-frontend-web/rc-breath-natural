@@ -14,3 +14,8 @@ export function resolveSiteUrl(value: string | undefined): string {
 }
 
 export const SITE_URL = resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL)
+
+export function canonicalHostname(siteUrl?: string): string {
+  const url = resolveSiteUrl(siteUrl)
+  return new URL(url).hostname.toLowerCase()
+}

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Header } from "@/components/Header";
 import { menuItems } from "@/static/menuItems";
 import Footer from "@/blocks/sections/footer";
+import AdsterraBanner from "@/components/AdsterraBanner";
 
 interface Props {
   children: ReactNode;
@@ -15,6 +16,8 @@ export default function DefaultLayout({ children }: Props) {
       <main className="grid w-full mx-auto py-16">
         {children}
       </main>
+
+      <AdsterraBanner format="native" />
 
       <Footer />
     </div>

@@ -9,6 +9,10 @@ export function buildCsp(gtmEnabled: boolean): string {
     'https://clarity.ms',
     'https://*.clarity.ms',
     'https://cdn.counter.dev',
+    // Discreet native banner: only injects when NEXT_PUBLIC_ADSTERRA_NATIVE_KEY is set in production.
+    'https://*.profitableratecpmnetwork.com',
+    'https://*.effectivegatecpm.com',
+    'https://www.highperformanceformat.com',
   ]
   return [
     "default-src 'self'",

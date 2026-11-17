@@ -1,0 +1,223 @@
+/**
+ * Discreet Adsterra slot: native banner only (display banner optional).
+ *
+ * Zone keys and script hosts come from public env vars. Nothing renders and no
+ * script is injected when the key is missing or `NEXT_PUBLIC_ADSTERRA_ENABLED`
+ * is `false`. The kill switch defaults to on only when a key is present.
+ *
+ * Consent follows the study-project modal when present. If
+ * `window.rcStudyModal.isAnalyticsEnabled` exists and returns false, do not
+ * load. A missing API does not block (the modal defaults analytics to on).
+ * Listen for `rc-study-modal:analytics` (`detail` is the new boolean) and
+ * unload if it becomes false.
+ *
+ * Callers must also require `NODE_ENV === 'production'` and the canonical
+ * hostname (`shouldLoadAdsterra`) so deploy previews stay clean.
+ */
+
+export const DEFAULT_BANNER_HOST = 'www.highperformanceformat.com';
+
+/** Fired by the study-project modal when the analytics toggle changes. */
+export const ADSTERRA_CONSENT_EVENT = 'rc-study-modal:analytics';
+
+const KEY_PATTERN = /^[a-z0-9]{8,64}$/i;
+const HOST_PATTERN = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
+const DESKTOP_MIN_WIDTH = 768;
+
+export type AdsterraFormat = 'native' | 'banner';
+export type AdsterraBannerVariant = 'rectangle' | 'responsive';
+
+export type AdsterraAtOptions = {
+  key: string;
+  format: 'iframe';
+  height: number;
+  width: number;
+  params: Record<string, never>;
+};
+
+export type AdsterraScript = {
+  format: AdsterraFormat;
+  key: string;
+  host: string;
+  src: string;
+  containerId: string;
+  width: number;
+  height: number;
+  atOptions?: AdsterraAtOptions;
+};
+
+export type BuildAdsterraScriptInput = {
+  format: AdsterraFormat;
+  nativeKey?: string;
+  nativeHost?: string;
+  bannerKey?: string;
+  bannerHost?: string;
+  enabledFlag?: string;
+  viewportWidth?: number;
+  bannerVariant?: AdsterraBannerVariant;
+};
+
+export type ShouldLoadAdsterraInput = {
+  script: AdsterraScript | null;
+  nodeEnv: string | undefined;
+  hostname: string;
+  canonicalHostname: string;
+  /**
+   * `null` when `rcStudyModal.isAnalyticsEnabled` is absent.
+   * `false` blocks the ad. `true` allows it.
+   */
+  analyticsEnabled: boolean | null;
+};
+
+export type RcStudyModalApi = {
+  open?: () => void;
+  isAnalyticsEnabled?: () => boolean;
+};
+
+declare global {
+  interface Window {
+    atOptions?: AdsterraAtOptions;
+    rcStudyModal?: RcStudyModalApi;
+  }
+}
+
+function clean(value: string | undefined): string {
+  return value?.trim() ?? '';
+}
+
+function isExplicitlyDisabled(flag: string | undefined): boolean {
+  const value = clean(flag).toLowerCase();
+  return value === 'false' || value === '0' || value === 'off';
+}
+
+function validKey(value: string | undefined): string | null {
+  const key = clean(value);
+  return KEY_PATTERN.test(key) ? key : null;
+}
+
+function validHost(value: string | undefined, fallback?: string): string | null {
+  const host = clean(value) || fallback || '';
+  return HOST_PATTERN.test(host) ? host : null;
+}
+
+function bannerSize(
+  variant: AdsterraBannerVariant,
+  viewportWidth: number,
+): { width: number; height: number } {
+  if (variant === 'rectangle') return { width: 300, height: 250 };
+  if (viewportWidth >= DESKTOP_MIN_WIDTH) return { width: 728, height: 90 };
+  return { width: 320, height: 50 };
+}
+
+/**
+ * Builds the official invoke.js URL for a native or display banner.
+ * Returns null when the slot is disabled or the key/host is unusable.
+ */
+export function buildAdsterraScript(input: BuildAdsterraScriptInput): AdsterraScript | null {
+  if (isExplicitlyDisabled(input.enabledFlag)) return null;
+
+  const viewportWidth = input.viewportWidth ?? DESKTOP_MIN_WIDTH;
+  const variant = input.bannerVariant ?? 'responsive';
+
+  if (input.format === 'native') {
+    const key = validKey(input.nativeKey);
+    const host = validHost(input.nativeHost);
+    if (!key || !host) return null;
+    return {
+      format: 'native',
+      key,
+      host,
+      src: `//${host}/${key}/invoke.js`,
+      containerId: `container-${key}`,
+      width: 728,
+      height: 120,
+    };
+  }
+
+  const key = validKey(input.bannerKey);
+  const host = validHost(input.bannerHost, DEFAULT_BANNER_HOST);
+  if (!key || !host) return null;
+  const size = bannerSize(variant, viewportWidth);
+  const atOptions: AdsterraAtOptions = {
+    key,
+    format: 'iframe',
+    height: size.height,
+    width: size.width,
+    params: {},
+  };
+  return {
+    format: 'banner',
+    key,
+    host,
+    src: `//${host}/${key}/invoke.js`,
+    containerId: `container-${key}`,
+    width: size.width,
+    height: size.height,
+    atOptions,
+  };
+}
+
+/** Production + canonical host + consent. A null script never loads. */
+export function shouldLoadAdsterra(input: ShouldLoadAdsterraInput): boolean {
+  if (!input.script) return false;
+  if (input.nodeEnv !== 'production') return false;
+  const hostname = input.hostname.trim().toLowerCase();
+  const canonical = input.canonicalHostname.trim().toLowerCase();
+  if (!hostname || hostname !== canonical) return false;
+  if (input.analyticsEnabled === false) return false;
+  return true;
+}
+
+/**
+ * Reads the study modal without throwing. `null` means the API is not there
+ * yet, which does not block the ad. A thrown read fails closed and blocks the ad.
+ */
+export function readAnalyticsConsent(modal: RcStudyModalApi | undefined): boolean | null {
+  if (typeof modal?.isAnalyticsEnabled !== 'function') return null;
+  try {
+    return modal.isAnalyticsEnabled() ? true : false;
+  } catch {
+    return false;
+  }
+}
+
+const SCRIPT_ID_PREFIX = 'adsterra-invoke-';
+
+export function adsterraScriptElementId(key: string): string {
+  return `${SCRIPT_ID_PREFIX}${key}`;
+}
+
+/**
+ * Inserts invoke.js once per key, inside the slot so removal unmounts with it.
+ * Display banners need `window.atOptions` set before the script runs.
+ * Returns null when that key's script is already in the document.
+ */
+export function mountAdsterraScript(
+  container: HTMLElement,
+  script: AdsterraScript,
+): HTMLScriptElement | null {
+  const doc = container.ownerDocument;
+  const scriptId = adsterraScriptElementId(script.key);
+  if (doc.getElementById(scriptId)) return null;
+
+  const view = doc.defaultView;
+  if (script.atOptions && view) {
+    view.atOptions = script.atOptions;
+  }
+
+  const node = doc.createElement('script');
+  node.id = scriptId;
+  node.async = true;
+  node.src = script.src;
+  container.appendChild(node);
+  return node;
+}
+
+export function removeAdsterraScript(doc: Document, key: string | undefined): void {
+  if (!key) return;
+  doc.getElementById(adsterraScriptElementId(key))?.remove();
+  const view = doc.defaultView;
+  if (view?.atOptions?.key === key) {
+    view.atOptions = undefined;
+  }
+}

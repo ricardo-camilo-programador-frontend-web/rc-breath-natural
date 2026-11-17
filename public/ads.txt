@@ -1,0 +1,2 @@
+# Adsterra: linha oficial (google.com, pub-XXXX ...) será adicionada quando o
+# suporte fornecer o publisher id. Nada a declarar por enquanto.

@@ -71,6 +71,11 @@ cp .env.example .env
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics measurement ID | No |
 | `NEXT_PUBLIC_GTM_ID` | Google Tag Manager ID | No |
 | `NEXT_PUBLIC_COUNTER_DEV_ID` | Counter.dev analytics ID | No |
+| `NEXT_PUBLIC_ADSTERRA_NATIVE_KEY` | Adsterra Native Banner zone key (empty = no ad) | No |
+| `NEXT_PUBLIC_ADSTERRA_NATIVE_HOST` | Adsterra script host, no `https://` (e.g. `plXXXX.effectivegatecpm.com`) | No |
+| `NEXT_PUBLIC_ADSTERRA_BANNER_KEY` | Optional display banner key | No |
+| `NEXT_PUBLIC_ADSTERRA_BANNER_HOST` | Optional display banner host (default `www.highperformanceformat.com`) | No |
+| `NEXT_PUBLIC_ADSTERRA_ENABLED` | `false` forces the ad slot off | No |
 | `NEXT_PUBLIC_LIVE_DEMO_VIDEO_URL` | Live demo video URL | No |
 | `TREFLE_API_KEY` | Trefle API key (server-side only) | No |
 
