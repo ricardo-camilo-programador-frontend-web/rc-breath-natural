@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "@/components/Modal";
 import { PortfolioShortcut } from "@/blocks/portfolioShortcut";
 import { useIntroModalStore } from "@/store/introModalStore";
+import { ADSTERRA_CONSENT_EVENT } from "@/lib/ads/adsterra";
 
 interface IntroWarningModalProps {
   linkedinUrl: string;
@@ -26,6 +27,23 @@ export default function IntroWarningModal({ linkedinUrl, portfolioUrl }: IntroWa
   useEffect(() => {
     clearAfterOneHour();
   }, [clearAfterOneHour]);
+
+  // Exposes the analytics-consent API consumed by the Adsterra banner slot.
+  useEffect(() => {
+    window.rcStudyModal = {
+      isAnalyticsEnabled: () => useIntroModalStore.getState().analyticsEnabled,
+    };
+    return () => {
+      delete window.rcStudyModal;
+    };
+  }, []);
+
+  // Notifies ad/analytics consumers whenever the toggle changes.
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent(ADSTERRA_CONSENT_EVENT, { detail: analyticsEnabled })
+    );
+  }, [analyticsEnabled]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -114,6 +132,11 @@ export default function IntroWarningModal({ linkedinUrl, portfolioUrl }: IntroWa
             />
           </button>
         </div>
+
+        <p className="text-xs text-gray-500 text-center">
+          Publicidade: este site exibe um anúncio discreto, sem pop-ups nem
+          redirecionamentos.
+        </p>
 
         <div className="border-t pt-4 mt-4">
           <p className="text-sm text-gray-500 text-center">
