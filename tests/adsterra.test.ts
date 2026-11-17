@@ -95,6 +95,7 @@ describe('security headers include ad hosts', () => {
     expect(csp).toContain('profitableratecpmnetwork.com')
     expect(csp).toContain('effectivegatecpm.com')
     expect(csp).toContain('highperformanceformat.com')
+    expect(csp).not.toContain('*.www.highperformanceformat.com')
   })
   it('includes rotating invoke-hosts when CSP is built', () => {
     const csp = buildCsp(false)
